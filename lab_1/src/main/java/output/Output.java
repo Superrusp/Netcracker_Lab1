@@ -239,5 +239,11 @@ public class Output {
 //         for(Class<? extends AbstractSorter> k : set){
 //             System.out.println(k);
 //         }
+        int arr[] = Filler.generateSortedArrayAscending(10);
+        BubbleSorter bubbleSorter = new BubbleSorterBegin();
+        bubbleSorter.sort(arr);
+        for(int i: arr){
+            System.out.print(i+" ");
+        }
     }
 }

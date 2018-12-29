@@ -7,7 +7,7 @@ public class Filler {
     @Generator(name = "SortedArrayAscending")
     public static int[] generateSortedArrayAscending(int ARRAY_LENGTH) {
         int[] array = new int[ARRAY_LENGTH];
-        for (int i = 0; i < ARRAY_LENGTH; i++) {
+        for (int i = 0; i < ARRAY_LENGTH-1; i++) {
             array[0] = generateRandomNumber();
             array[i+1] = array[i] + generateRandomNumber();
         }
