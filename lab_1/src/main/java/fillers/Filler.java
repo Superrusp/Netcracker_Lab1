@@ -51,6 +51,6 @@ public class Filler {
     }
 
     private static int generateRandomNumber() {
-        return (int) (Math.random() * 1000);
+        return (int) (Math.random() * 100);
     }
 }
