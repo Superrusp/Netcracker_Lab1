@@ -1,6 +1,14 @@
 package output;
 
 import analyzer.Analyzer;
+import fillers.Filler;
+import sorters.BubbleSorterBegin;
+import sorters.abstraction.AbstractSorter;
+import sorters.abstraction.BubbleSorter;
+
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Output {
 
@@ -156,8 +164,8 @@ public class Output {
 
     private static void printMergedBubbleSortFromTheBeginningToRandomArray() {
         System.out.println("MergedBubbleSort from the beginning: \t\t\t" + Analyzer.
-                mergedBubbleSortFromTheBeginningToRandomArray() + " ns");
-    }
+            mergedBubbleSortFromTheBeginningToRandomArray() + " ns");
+}
 
     private static void printMergedBubbleSortFromTheEndToRandomArray() {
         System.out.println("MergedBubbleSort from the end: \t\t\t\t\t" + Analyzer.
@@ -225,6 +233,11 @@ public class Output {
     }
 
     public static void main(String[] args) {
-        printResults();
+        //printResults();
+//        Set<Class<? extends AbstractSorter>> set;
+//         set =  Analyzer.getSubTypes();
+//         for(Class<? extends AbstractSorter> k : set){
+//             System.out.println(k);
+//         }
     }
 }

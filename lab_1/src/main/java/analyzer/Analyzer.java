@@ -1,7 +1,13 @@
 package analyzer;
 
 import fillers.Filler;
-import sorters.Sorter;
+import fillers.Generator;
+import org.reflections.scanners.MethodAnnotationsScanner;
+import sorters.*;
+import org.reflections.Reflections;
+import sorters.abstraction.AbstractSorter;
+import java.lang.reflect.Method;
+import java.util.Set;
 
 public class Analyzer {
     private static long startTime;
@@ -186,58 +192,76 @@ public class Analyzer {
 
     // Time measurement methods for different sorts
     private static long measureTimeOfBubbleSortFromTheBeginning(int[] arr){
+        BubbleSorterBegin sorterBegin = new BubbleSorterBegin();
         startTime = System.nanoTime();
-        Sorter.bubbleSortFromTheBeginning(arr);
+        sorterBegin.sort(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfBubbleSortFromTheEnd(int[] arr){
+        BubbleSorterEnd sorterEnd = new BubbleSorterEnd();
         startTime = System.nanoTime();
-        Sorter.bubbleSortFromTheEnd(arr);
+        sorterEnd.sort(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfArraySort(int[] arr){
+        BaseSorter baseSorter = new BaseSorter();
         startTime = System.nanoTime();
-        Sorter.arraySort(arr);
+        baseSorter.sort(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfQuickSort(int[] arr){
+        QuickSorter quickSorter = new QuickSorter();
         startTime = System.nanoTime();
-        Sorter.quickSort(arr);
+        quickSorter.sort(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfMergedBubbleSortFromTheBeginning(int[] arr){
+        MergedBubbleSorterBegin mergedBubbleSorterBegin = new MergedBubbleSorterBegin();
         startTime = System.nanoTime();
-        Sorter.mergedBubbleSortFromTheBeginning(arr);
+        mergedBubbleSorterBegin.divideArray(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfMergedBubbleSortFromTheEnd(int[] arr){
+        MergedBubbleSorterEnd mergedBubbleSorterEnd = new MergedBubbleSorterEnd();
         startTime = System.nanoTime();
-        Sorter.mergedBubbleSortFromTheEnd(arr);
+        mergedBubbleSorterEnd.divideArray(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfMergedQuickSort(int[] arr){
+        MergedQuickSorter mergedQuickSorter = new MergedQuickSorter();
         startTime = System.nanoTime();
-        Sorter.mergedQuickSort(arr);
+        mergedQuickSorter.divideArray(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
     }
 
     private static long measureTimeOfMergedArraySort(int[] arr){
+        MergedBaseSorter mergedBaseSorter = new MergedBaseSorter();
         startTime = System.nanoTime();
-        Sorter.mergedArraySort(arr);
+        mergedBaseSorter.divideArray(arr);
         endTime = System.nanoTime() - startTime;
         return endTime;
+    }
+
+    public static Set<Method> getAnnotatedMethod(){
+        Reflections reflections = new Reflections("fillers", MethodAnnotationsScanner.class);
+        return reflections.getMethodsAnnotatedWith(Generator.class);
+    }
+
+    public static Set<Class<? extends AbstractSorter>> getSubTypes() {
+        Reflections reflections = new Reflections("sorters");
+        return reflections.getSubTypesOf(AbstractSorter.class);
     }
 }
