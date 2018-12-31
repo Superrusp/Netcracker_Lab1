@@ -2,266 +2,113 @@ package analyzer;
 
 import fillers.Filler;
 import fillers.Generator;
-import org.reflections.scanners.MethodAnnotationsScanner;
-import sorters.*;
-import org.reflections.Reflections;
+import sorters.Sorter;
 import sorters.abstraction.AbstractSorter;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The class <b>Analyzer</b> analyzes the sorting time of differently filled arrays.
+ * <p>It generates different sizes of the array and measures sort time of each one.
+ *
+ * @author Amir Dogmosh
+ */
 public class Analyzer {
-    private static long startTime;
-    private static long endTime;
-    private static final int ARRAY_LENGTH = 50;
-    private static final int X = (int) (Math.random() * ARRAY_LENGTH);
+    /**
+     * The value presents an array which will be equated to various fillers.
+     */
+    private int[] mass;
 
-    //Fillers
-    private static int[] sortedArrayAscending = Filler.generateSortedArrayAscending(ARRAY_LENGTH);
-    private static int[] sortedArrayWithX = Filler.generateSortedArrayWithX(ARRAY_LENGTH, X);
-    private static int[] sortedArrayDescending = Filler.generateSortedArrayDescending(ARRAY_LENGTH);
-    private static int[] randomArray = Filler.generateRandomArray(ARRAY_LENGTH);
+    /**
+     * The value is used to started counting the sort time.
+     */
+    private long startTime;
 
+    /**
+     * The value is used to stop counting the sort time.
+     */
+    private long endTime;
 
-    // Measures time to sort already sorted array
-    public static long bubbleSortFromTheBeginningToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfBubbleSortFromTheBeginning(array);
-    }
+    /**
+     * The object of class <b>Reflector</b> is used to get fillers and sorters using reflection.
+     */
+    private Reflector reflector;
+    /**
+     * The collection of methods which will be presented fillers of the array.
+     */
+    private Set<Method> methods;
 
-    public static long bubbleSortFromTheEndToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfBubbleSortFromTheEnd(array);
-    }
-
-    public static long quickSortToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfQuickSort(array);
-    }
-
-    public static long arraySortToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfArraySort(array);
-    }
-
-    public static long mergedBubbleSortFromTheBeginningToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfMergedBubbleSortFromTheBeginning(array);
-    }
-
-    public static long mergedBubbleSortFromTheEndToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfMergedBubbleSortFromTheEnd(array);
-    }
-
-    public static long mergedQuickSortToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfMergedQuickSort(array);
-    }
-
-    public static long mergedArraySortToSortedArray(){
-        int[] array = sortedArrayAscending.clone();
-        return measureTimeOfMergedArraySort(array);
+    public Analyzer(){
+        reflector = new Reflector();
+        methods = new HashSet<>();
     }
 
 
-    // Measures time to sort already sorted array with X
-    public static long bubbleSortFromTheBeginningToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfBubbleSortFromTheBeginning(array);
+    /**
+     * This method analyzes fillers and inherited classes of class
+     * <b>AbstractSorter</b>
+     * <p>It gives information about sorting time of each sorter.
+     *
+     * @param count the amount of arrays that have different size.
+     * @see Analyzer#generateArrayOfSizes(int).
+     */
+    public void analyzeSorters(int count){
+     for(int size : generateArrayOfSizes(count)) {
+         for (Method method : reflector.getFillers(methods)) {
+             try {
+                 Set<AbstractSorter> sorters = new HashSet<>();
+
+                 Generator generator = method.getAnnotation(Generator.class);
+                 System.out.println(generator.name());
+
+                 mass = (int[]) method.invoke(Filler.class, size);
+
+                 for (AbstractSorter sorter : reflector.getObjects(sorters)) {
+                     measureTime(sorter);
+
+                     Sorter annotation = sorter.getClass().getAnnotation(Sorter.class);
+                     System.out.println(annotation.sorterName()+" has sort time: " + endTime + " ns");
+                     for (int arr : mass) {
+                         System.out.print(arr + " ");
+                     }
+                     System.out.println();
+                 }
+             } catch (IllegalAccessException e) {
+                 e.printStackTrace();
+             } catch (InvocationTargetException e) {
+                 e.printStackTrace();
+             }
+         }
+     }
     }
 
-    public static long bubbleSortFromTheEndToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfBubbleSortFromTheEnd(array);
-    }
-
-    public static long quickSortToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfQuickSort(array);
-    }
-
-    public static long arraySortToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfArraySort(array);
-    }
-
-    public static long mergedBubbleSortFromTheBeginningToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfMergedBubbleSortFromTheBeginning(array);
-    }
-
-    public static long mergedBubbleSortFromTheEndToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfMergedBubbleSortFromTheEnd(array);
-    }
-
-    public static long mergedQuickSortToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfMergedQuickSort(array);
-    }
-
-    public static long mergedArraySortToSortedArrayWithX(){
-        int[] array = sortedArrayWithX.clone();
-        return measureTimeOfMergedArraySort(array);
-    }
-
-
-    // Measures time to sort already sorted descending array
-    public static long bubbleSortFromTheBeginningToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfBubbleSortFromTheBeginning(array);
-    }
-
-    public static long bubbleSortFromTheEndToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfBubbleSortFromTheEnd(array);
-    }
-
-    public static long quickSortToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfQuickSort(array);
-    }
-
-    public static long arraySortToSortedArrayDescending (){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfArraySort(array);
-    }
-
-    public static long mergedBubbleSortFromTheBeginningToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfMergedBubbleSortFromTheBeginning(array);
-    }
-
-    public static long mergedBubbleSortFromTheEndToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfBubbleSortFromTheEnd(array);
-    }
-
-    public static long mergedQuickSortToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfMergedQuickSort(array);
-    }
-
-    public static long mergedArraySortToSortedArrayDescending(){
-        int[] array = sortedArrayDescending.clone();
-        return measureTimeOfMergedArraySort(array);
-    }
-
-
-    // Measures time to sort random array
-    public static long bubbleSortFromTheBeginningToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfBubbleSortFromTheBeginning(array);
-    }
-
-    public static long bubbleSortFromTheEndToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfBubbleSortFromTheEnd(array);
-    }
-
-    public static long quickSortToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfQuickSort(array);
-    }
-
-    public static long arraySortToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfArraySort(array);
-    }
-
-    public static long mergedBubbleSortFromTheBeginningToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfMergedBubbleSortFromTheBeginning(array);
-    }
-
-    public static long mergedBubbleSortFromTheEndToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfMergedBubbleSortFromTheEnd(array);
-    }
-
-    public static long mergedQuickSortToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfMergedQuickSort(array);
-    }
-
-    public static long mergedArraySortToRandomArray(){
-        int[] array = randomArray.clone();
-        return measureTimeOfMergedArraySort(array);
-    }
-
-
-    // Time measurement methods for different sorts
-    private static long measureTimeOfBubbleSortFromTheBeginning(int[] arr){
-        BubbleSorterBegin sorterBegin = new BubbleSorterBegin();
+    /**
+     * This method measures the sorting time of each object that extended
+     * class {@link sorters.abstraction.AbstractSorter}.
+     *
+     * @param sorter the object of class <b>AbstractSorter</b>
+     *               invokes {@link AbstractSorter#sort(int[])} method.
+     * @see Analyzer#analyzeSorters(int).
+     */
+    private void measureTime(AbstractSorter sorter){
         startTime = System.nanoTime();
-        sorterBegin.sort(arr);
+        sorter.sort(mass.clone());
         endTime = System.nanoTime() - startTime;
-        return endTime;
     }
 
-    private static long measureTimeOfBubbleSortFromTheEnd(int[] arr){
-        BubbleSorterEnd sorterEnd = new BubbleSorterEnd();
-        startTime = System.nanoTime();
-        sorterEnd.sort(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfArraySort(int[] arr){
-        BaseSorter baseSorter = new BaseSorter();
-        startTime = System.nanoTime();
-        baseSorter.sort(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfQuickSort(int[] arr){
-        QuickSorter quickSorter = new QuickSorter();
-        startTime = System.nanoTime();
-        quickSorter.sort(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfMergedBubbleSortFromTheBeginning(int[] arr){
-        MergedBubbleSorterBegin mergedBubbleSorterBegin = new MergedBubbleSorterBegin();
-        startTime = System.nanoTime();
-        mergedBubbleSorterBegin.divideArray(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfMergedBubbleSortFromTheEnd(int[] arr){
-        MergedBubbleSorterEnd mergedBubbleSorterEnd = new MergedBubbleSorterEnd();
-        startTime = System.nanoTime();
-        mergedBubbleSorterEnd.divideArray(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfMergedQuickSort(int[] arr){
-        MergedQuickSorter mergedQuickSorter = new MergedQuickSorter();
-        startTime = System.nanoTime();
-        mergedQuickSorter.divideArray(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    private static long measureTimeOfMergedArraySort(int[] arr){
-        MergedBaseSorter mergedBaseSorter = new MergedBaseSorter();
-        startTime = System.nanoTime();
-        mergedBaseSorter.divideArray(arr);
-        endTime = System.nanoTime() - startTime;
-        return endTime;
-    }
-
-    public static Set<Method> getAnnotatedMethod(){
-        Reflections reflections = new Reflections("fillers", MethodAnnotationsScanner.class);
-        return reflections.getMethodsAnnotatedWith(Generator.class);
-    }
-
-    public static Set<Class<? extends AbstractSorter>> getSubTypes() {
-        Reflections reflections = new Reflections("sorters");
-        return reflections.getSubTypesOf(AbstractSorter.class);
+    /**
+     * This method generates the different sizes of the array.
+     *
+     * @param count the array size
+     * @return the array that keeps sizes.
+     */
+    private int[] generateArrayOfSizes(int count){
+       int[] arr = new int[count];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = (int) (Math.random() * 10);
+        }
+        return arr;
     }
 }
