@@ -2,13 +2,30 @@ package sorters;
 
 import sorters.abstraction.AbstractSorter;
 
-public class QuickSorter extends AbstractSorter {
-
+/**
+ * Class that extends {@link sorters.abstraction.AbstractSorter} class.
+ * <p>This class presents quick sort algorithm.
+ *
+ * @author Amir Dogmosh
+ */
+@Sorter(sorterName = "QuickSorter")
+public final class QuickSorter extends AbstractSorter {
+    /**
+     * <p>Method calls {@code quickSort} to do sort.
+     *
+     * @param array the array that will be sorted.
+     */
     @Override
     public void sort(int[] array) {
         quickSort(array, 0, array.length-1);
     }
 
+    /**
+     * Method sorts an array using quick sort algorithm
+     * @param arr the array that will be sorted.
+     * @param first the first element of array.
+     * @param last the last element of array.
+     */
     private static void quickSort(int[] arr, int first, int last)
     {
         if (first >= last){
