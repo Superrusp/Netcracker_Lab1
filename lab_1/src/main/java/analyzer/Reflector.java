@@ -3,6 +3,7 @@ package analyzer;
 import fillers.Filler;
 import fillers.Generator;
 import org.reflections.Reflections;
+import sorters.Sorter;
 import sorters.abstraction.AbstractSorter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -77,5 +78,23 @@ public class Reflector {
             }
         }
         return sorters;
+    }
+
+    /**
+     * This method returns annotation's name which is marked on the method.
+     * @param method the method is used to find its name using annotation.
+     */
+    public String getFillerName(Method method){
+        Generator generator = method.getAnnotation(Generator.class);
+        return generator.name();
+    }
+
+    /**
+     * This method returns annotation's name which marked on the class.
+     * @param abstractSorter the object is used to find its name using annotation.
+     */
+    public String getSorterName(AbstractSorter abstractSorter){
+        Sorter sorter = abstractSorter.getClass().getAnnotation(Sorter.class);
+        return sorter.sorterName();
     }
 }
