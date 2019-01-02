@@ -6,7 +6,7 @@ import sorters.abstraction.BubbleSorter;
  *
  * @author Amir Dogmosh
  */
-@Sorter(sorterName = "BubbleSorterBegin")
+@Sorter(sorterName = "BubbleSorterEnd")
 public class BubbleSorterEnd extends BubbleSorter {
 
     /**
