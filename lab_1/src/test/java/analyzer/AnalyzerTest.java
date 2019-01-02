@@ -25,8 +25,8 @@ public class AnalyzerTest {
 
     @Test(timeout = 5000)
     public void testAnalyzeSortersTime() {
-        // 5 (times) * 32 (fillers*sorters) = 160 results;
-        analyzer.analyzeSorters(5);
+        // 15 (times) * 32 (fillers*sorters) = 480 results;
+        analyzer.analyzeSorters(15);
     }
 
     @Test(expected = NumberFormatException.class)
