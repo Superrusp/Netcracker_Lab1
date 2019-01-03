@@ -48,7 +48,7 @@ public class Reflector {
      *
      * @param fillers presents a collection of methods,
      *                that will be called to fill the array.
-     * @see Analyzer#analyzeSorters(int).
+     * @see Analyzer#getSortTime(Method, AbstractSorter, int).
      */
     public Set<Method> getFillers(Set<Method> fillers) {
         Method[] methods = Filler.class.getMethods();
@@ -65,7 +65,6 @@ public class Reflector {
      *
      * @param sorters the collection of objects, which contains subclasses of class <b>AbstractSorter</b>.
      * @return the collection that will be used to call {@link AbstractSorter#sort(int[])}method.
-     * @see Analyzer#analyzeSorters(int).
      */
     public Set<AbstractSorter> getObjects(Set<AbstractSorter> sorters) {
         for (Class<? extends AbstractSorter> sorter : getSubClasses()) {
