@@ -1,13 +1,9 @@
 package analyzer;
 
 import fillers.Filler;
-import fillers.Generator;
-import sorters.Sorter;
 import sorters.abstraction.AbstractSorter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * The class <b>Analyzer</b> analyzes the sorting time of differently filled arrays.
@@ -22,66 +18,28 @@ public class Analyzer {
     private int[] mass;
 
     /**
-     * The value is used to started counting the sort time.
+     * The value is used to calculate sort time.
      */
-    private long startTime;
+    private long sortTime;
 
     /**
-     * The value is used to stop counting the sort time.
-     */
-    private long endTime;
-
-    /**
-     * The object of class <b>Reflector</b> is used to get fillers and sorters using reflection.
-     */
-    private Reflector reflector;
-    /**
-     * The collection of methods which will be presented fillers of the array.
-     */
-    private Set<Method> methods;
-
-    public Analyzer(){
-        reflector = new Reflector();
-        methods = new HashSet<>();
-    }
-
-
-    /**
-     * This method analyzes fillers and inherited classes of class
-     * <b>AbstractSorter</b>
-     * <p>It gives information about sorting time of each sorter.
+     * This method analyzes fillers and inherited classes of class <b>AbstractSorter</b>
+     * <p>Gives information about sorting time of each sorter.
      *
-     * @param count the amount of arrays that have different size.
-     * @see Analyzer#generateArrayOfSizes(int).
+     * @param method the method is used to invoke one of the methods of class <b>Filler</b>.
+     * @param sorter the object is used to find inherited class and transfer to {@link #measureTime(AbstractSorter)}.
+     * @param ARRAY_LENGTH the size of the array.
+     * @return sorting time
      */
-    public void analyzeSorters(int count){
-     for(int size : generateArrayOfSizes(count)) {
-         for (Method method : reflector.getFillers(methods)) {
-             try {
-                 Set<AbstractSorter> sorters = new HashSet<>();
-
-                 Generator generator = method.getAnnotation(Generator.class);
-                 System.out.println(generator.name());
-
-                 mass = (int[]) method.invoke(Filler.class, size);
-
-                 for (AbstractSorter sorter : reflector.getObjects(sorters)) {
-                     measureTime(sorter);
-
-                     Sorter annotation = sorter.getClass().getAnnotation(Sorter.class);
-                     System.out.println(annotation.sorterName()+" has sort time: " + endTime + " ns");
-                     for (int arr : mass) {
-                         System.out.print(arr + " ");
-                     }
-                     System.out.println();
-                 }
-             } catch (IllegalAccessException e) {
-                 e.printStackTrace();
-             } catch (InvocationTargetException e) {
-                 e.printStackTrace();
-             }
-         }
-     }
+    public long getSortTime(Method method, AbstractSorter sorter, final int ARRAY_LENGTH){
+        try {
+            mass = (int[]) method.invoke(Filler.class, ARRAY_LENGTH);
+            measureTime(sorter);
+        }
+        catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return sortTime;
     }
 
     /**
@@ -90,24 +48,25 @@ public class Analyzer {
      *
      * @param sorter the object of class <b>AbstractSorter</b>
      *               invokes {@link AbstractSorter#sort(int[])} method.
-     * @see Analyzer#analyzeSorters(int).
+     * @see Analyzer#getSortTime(Method, AbstractSorter, int).
      */
     private void measureTime(AbstractSorter sorter){
-        startTime = System.nanoTime();
+        long startTime = System.nanoTime();
         sorter.sort(mass.clone());
-        endTime = System.nanoTime() - startTime;
+        sortTime = System.nanoTime() - startTime;
     }
 
     /**
      * This method generates the different sizes of the array.
      *
-     * @param count the array size
+     * @param COUNT the count of array sizes
      * @return the array that keeps sizes.
      */
-    private int[] generateArrayOfSizes(int count){
-       int[] arr = new int[count];
-        for (int i = 0; i < arr.length; i++) {
-            arr[i] = (int) (Math.random() * 10);
+    public int[] generateArraySizes(final int COUNT){
+        int[] arr = new int[COUNT];
+        arr[0] = 100;
+        for (int i = 1; i < arr.length; i++) {
+            arr[i] = arr[i-1] + 1000;
         }
         return arr;
     }
