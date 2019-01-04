@@ -66,7 +66,7 @@ public class Analyzer {
         int[] arr = new int[COUNT];
         arr[0] = 100;
         for (int i = 1; i < arr.length; i++) {
-            arr[i] = arr[i-1] + 1000;
+            arr[i] = arr[i-1] + 2000;
         }
         return arr;
     }
